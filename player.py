@@ -18,15 +18,17 @@ class Player(pygame.sprite.Sprite):
         self.animation_speed = 9  # How fast to go through the animation cycle
         self.animation_counter = 0
         self.image = self.images[self.current_image]
-        self.rect = self.image.get_rect(topleft=(60, 280))
+        self.rect = self.image.get_rect(topleft=(50, 320))
         # player_1 = pygame.image.load('graphics/character.png')
 
     def player_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
-            self.move_up()
+            #self.move_up()
+            pass
         if keys[pygame.K_s]:
-            self.move_down()
+            #self.move_down()
+            pass
         if keys[pygame.K_a]:
             self.move_left()
         if keys[pygame.K_d]:

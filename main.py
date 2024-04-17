@@ -3,6 +3,7 @@ import time
 from sys import exit
 from player import Player
 from target import Target
+from hill import Hill
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR
 
 def draw_text(surf, text, size, x, y, color):
@@ -11,6 +12,10 @@ def draw_text(surf, text, size, x, y, color):
     text_rect = text_surface.get_rect()
     text_rect.topright = (x, y)
     surf.blit(text_surface, text_rect)
+
+def initialize_hills():
+    hill_group.add(Hill(320, FLOOR + 50, 50, 310, 'graphics/hill_tile.png'))  # Specify x, y, width, height
+
 
 def initialize_targets():
     target1 = Target(430, FLOOR-20, 'graphics/enemy_fuel_canister.png')
@@ -35,8 +40,6 @@ pygame.display.set_caption('Scorch')
 clock = pygame.time.Clock()
 pygame.mixer.init()
 
-
-
 # Initialize last update times
 last_angle_update = time.time()
 last_speed_update = time.time()
@@ -48,12 +51,17 @@ speed_update_interval = 0.1
 background_surf = pygame.image.load('graphics/background_2.webp').convert()
 background_surf = pygame.transform.scale(background_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+hill_group = pygame.sprite.Group()
+initialize_hills()
+
 # Play the music
 pygame.mixer.music.load('music/Stoneworld Battle.mp3')
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
 cannon_sound = pygame.mixer.Sound('music/cannon_fire_2.mp3')
 cannon_sound.set_volume(0.9)
+hit_target_sound = pygame.mixer.Sound('music/fireball-whoosh.mp3')
+hit_target_sound.set_volume(1)
 
 # Setup
 all_sprites = pygame.sprite.Group()
@@ -101,6 +109,7 @@ while True:
 
     # Layer in background
     screen.blit(background_surf,(0,0))
+    hill_group.draw(screen)
 
     # Update all sprite groups
     all_sprites.update()
@@ -109,10 +118,12 @@ while True:
 
     # Collision detection
     hits = pygame.sprite.groupcollide(projectiles, targets, True, True)
+    pygame.sprite.groupcollide(projectiles, hill_group, True, False)
 
     if hits:
         for projectile, hit_targets in hits.items():
             for target in hit_targets:
+                hit_target_sound.play()
                 print(f"Hit detected: Projectile at {projectile.rect.center} hit target at {target.rect.center}")
 
     for entity in all_sprites:
