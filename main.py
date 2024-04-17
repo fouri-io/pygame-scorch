@@ -3,7 +3,7 @@ import time
 from sys import exit
 from player import Player
 from target import Target
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR
 
 def draw_text(surf, text, size, x, y, color):
     font = pygame.font.Font(None, size)
@@ -11,6 +11,22 @@ def draw_text(surf, text, size, x, y, color):
     text_rect = text_surface.get_rect()
     text_rect.topright = (x, y)
     surf.blit(text_surface, text_rect)
+
+def initialize_targets():
+    target1 = Target(430, FLOOR-20, 'graphics/enemy_fuel_canister.png')
+    targets.add(target1)
+
+    target2= Target(550, 370, 'graphics/enemy_fuel_canister.png')
+    targets.add(target2)
+
+    target3 = Target(850, 320, 'graphics/enemy_bomb.png')
+    targets.add(target3)
+
+    target5 = Target(1100, FLOOR -170, 'graphics/enemy_fuel_canister.png')
+    targets.add(target5)
+
+    target4 = Target(915, FLOOR - 35, 'graphics/enemy_tank_still.png')
+    targets.add(target4)
 
 # Initialize Game
 pygame.init()
@@ -25,12 +41,15 @@ last_speed_update = time.time()
 angle_update_interval = 0.1  # Seconds between updates
 speed_update_interval = 0.1
 
+# Prepare the background
+background_surf = pygame.image.load('graphics/background_2.webp').convert()
+background_surf = pygame.transform.scale(background_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 # Setup
 all_sprites = pygame.sprite.Group()
 projectiles = pygame.sprite.Group()
 targets = pygame.sprite.Group()
-target1 = Target(900, 200, 50, 50)
-targets.add(target1)
+initialize_targets()
 
 current_angle = 45
 current_speed = 20
@@ -45,6 +64,7 @@ while True:
             exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
+                player.start_firing_animation()
                 projectiles.add(player.fire(current_angle, current_speed))
 
     keys = pygame.key.get_pressed()
@@ -68,19 +88,30 @@ while True:
         current_speed = max(1, current_speed - 1)
         last_speed_update = current_time
 
-    screen.fill("purple")
+    # Layer in background
+    screen.blit(background_surf,(0,0))
+
+    # Update all sprite groups
     all_sprites.update()
     projectiles.update()
     targets.update()
 
+    # Collision detection
+    hits = pygame.sprite.groupcollide(projectiles, targets, True, True)
+
+    if hits:
+        for projectile, hit_targets in hits.items():
+            for target in hit_targets:
+                print(f"Hit detected: Projectile at {projectile.rect.center} hit target at {target.rect.center}")
+
     for entity in all_sprites:
-        screen.blit(entity.surf, entity.rect)
+        screen.blit(entity.image, entity.rect)
     for projectile in projectiles:
         screen.blit(projectile.surf, projectile.rect)
         if len(projectile.path) > 1:
             pygame.draw.lines(screen, (0, 255, 0), False, projectile.path, 2)  # Draw the path in green
     for target in targets:
-        screen.blit(target.surf, target.rect)
+        screen.blit(target.image, target.rect)
 
     # Display the current angle and speed
     draw_text(screen, f"Angle: {current_angle}°", 24, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 50, (255, 255, 255))

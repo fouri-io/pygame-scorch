@@ -2,8 +2,7 @@ import pygame
 
 
 class Target(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, image_path, width=None, height=None):
         super().__init__()
-        self.surf = pygame.Surface((width, height))
-        self.surf.fill((0,128,255))
-        self.rect = self.surf.get_rect(center=(x,y))
+        self.image = pygame.image.load(image_path).convert_alpha()
+        self.rect = self.image.get_rect(center=(x,y))
