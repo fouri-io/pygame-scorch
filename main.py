@@ -33,6 +33,9 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Scorch')
 clock = pygame.time.Clock()
+pygame.mixer.init()
+
+
 
 # Initialize last update times
 last_angle_update = time.time()
@@ -44,6 +47,13 @@ speed_update_interval = 0.1
 # Prepare the background
 background_surf = pygame.image.load('graphics/background_2.webp').convert()
 background_surf = pygame.transform.scale(background_surf, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Play the music
+pygame.mixer.music.load('music/Stoneworld Battle.mp3')
+pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.play(-1)
+cannon_sound = pygame.mixer.Sound('music/cannon_fire_2.mp3')
+cannon_sound.set_volume(0.9)
 
 # Setup
 all_sprites = pygame.sprite.Group()
@@ -65,6 +75,7 @@ while True:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 player.start_firing_animation()
+                cannon_sound.play()
                 projectiles.add(player.fire(current_angle, current_speed))
 
     keys = pygame.key.get_pressed()
