@@ -48,9 +48,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.player_input()
 
-    def fire(self):
-        angle = 45  # This could be dynamic based on player input or game mechanics
-        speed = 20
+    def fire(self, angle, speed):
         from projectile import Projectile  # Import here to avoid circular imports
         new_projectile = Projectile(self.rect.centerx, self.rect.top, angle, speed)
         return new_projectile

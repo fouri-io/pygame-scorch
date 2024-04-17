@@ -5,7 +5,7 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 600
 
 # Game environment settings
-FLOOR = int(SCREEN_HEIGHT * .9)
+FLOOR = int(SCREEN_HEIGHT * .8)
 GAME_ACTIVE = False
 SCORE = 0
 GRAVITY = 0.5
